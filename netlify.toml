@@ -1,0 +1,30 @@
+# Netlify deployment for the client only. Deploy the API separately
+# (see render.yaml or server/railway.toml) and point VITE_API_URL at it.
+#
+# In the Netlify UI: New site from Git -> pick this repo -> these build
+# settings are read from this file automatically, no manual entry needed.
+# Set VITE_API_URL as a Netlify environment variable (Site settings ->
+# Environment variables) before the first deploy, for example:
+#   VITE_API_URL = https://todo-api.onrender.com
+
+[build]
+  # Runs from the repository root, which is where the npm workspaces live.
+  command = "npm install && npm run build"
+  publish = "client/dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# The SPA fallback redirect (so /home and /search work on refresh) lives in
+# client/public/_redirects, which Vite copies into client/dist on build.
+
+# Optional alternative to VITE_API_URL: proxy /api/* to the deployed API
+# through Netlify instead of calling it directly from the browser. This
+# avoids needing CORS configured on the API, at the cost of an extra hop.
+# Uncomment and fill in the API origin, and leave VITE_API_URL unset.
+#
+# [[redirects]]
+#   from = "/api/*"
+#   to = "https://todo-api.onrender.com/api/:splat"
+#   status = 200
+#   force = true

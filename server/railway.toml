@@ -1,0 +1,24 @@
+# Railway deployment for the API. In the Railway dashboard: New Project ->
+# Deploy from GitHub repo, then in the service's Settings -> Root Directory,
+# set it to "server" so Railway finds this file and builds only this
+# workspace. Railway auto-detects Node via Nixpacks; this file just pins
+# the exact commands and health check.
+#
+# MongoDB is not a first-party managed database on Railway either. Either
+# add the "MongoDB" template from Railway's marketplace to this project and
+# reference its connection string, or use MongoDB Atlas as with Render.
+# Either way, set it as this service's MONGODB_URI variable.
+#
+# Also set CLIENT_ORIGIN to the deployed Netlify URL. PORT is injected by
+# Railway automatically; the app already reads process.env.PORT.
+
+[build]
+builder = "NIXPACKS"
+buildCommand = "npm install"
+
+[deploy]
+startCommand = "npm start"
+healthcheckPath = "/api/health"
+healthcheckTimeout = 30
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3

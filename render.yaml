@@ -1,0 +1,24 @@
+# Render Blueprint for the API. In the Render dashboard: New -> Blueprint,
+# point it at this repository, and Render reads this file automatically.
+#
+# MongoDB is not offered as a first-party managed database on Render.
+# Create a free cluster at https://www.mongodb.com/atlas and set
+# MONGODB_URI below to its connection string (Render prompts for any
+# envVar marked `sync: false` when the blueprint is applied).
+services:
+  - type: web
+    name: todo-api
+    runtime: node
+    plan: free
+    rootDir: server
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: MONGODB_URI
+        sync: false
+      - key: CLIENT_ORIGIN
+        sync: false
+        # Set to the deployed Netlify URL, e.g. https://todo-app.netlify.app
+      # PORT is provided by Render automatically; the app reads
+      # process.env.PORT already, so it does not need to be set here.
