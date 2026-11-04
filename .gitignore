@@ -17,3 +17,5 @@ Thumbs.db
 
 # Cursor agents
 .cursor/
+
+package-lock.json
