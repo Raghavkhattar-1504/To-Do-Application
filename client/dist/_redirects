@@ -1,0 +1,4 @@
+# Serve index.html for every path so React Router can handle client-side
+# routes (/, /home, /search) directly, including a hard refresh or a
+# bookmark. Without this, Netlify returns a 404 for anything but /.
+/*   /index.html   200
