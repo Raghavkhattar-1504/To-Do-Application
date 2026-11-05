@@ -181,6 +181,7 @@ Open the deployed Netlify URL, confirm the welcome screen appears, press **Get S
 
 - A CORS error almost always means `CLIENT_ORIGIN` on the API doesn't exactly match the Netlify URL yet.
 - A failed connection usually means `VITE_API_URL` is wrong, or has a stray `/api` or trailing slash in it.
+- **"Could not load tasks: The API returned an unexpected response"** on `/home` means the request got an HTML page instead of JSON. This happens when `VITE_API_URL` was not set at build time: the browser calls `/api/tasks` on the Netlify domain, and the `_redirects` catch-all answers with `index.html` and status 200. Set `VITE_API_URL` in Netlify and **trigger a new deploy** (Vite bakes it in at build time; changing it without rebuilding has no effect). Older builds crashed with `Cannot read properties of null (reading 'filter')` for the same reason.
 
 ## 10. Where things live
 

@@ -21,7 +21,14 @@
 # Optional alternative to VITE_API_URL: proxy /api/* to the deployed API
 # through Netlify instead of calling it directly from the browser. This
 # avoids needing CORS configured on the API, at the cost of an extra hop.
-# Uncomment and fill in the API origin, and leave VITE_API_URL unset.
+# Leave VITE_API_URL unset. Netlify reads client/public/_redirects BEFORE
+# this file and first match wins, so its `/*` catch-all would swallow
+# /api/* (answering with index.html) if this rule sat only here. To use the
+# proxy, put the equivalent line ABOVE the catch-all in _redirects instead:
+#   /api/*  https://todo-api.onrender.com/api/:splat  200
+# Or, keep the rule below and delete the `/*` line from _redirects in favor
+# of a `[[redirects]] from = "/*" to = "/index.html" status = 200` entry
+# placed AFTER it in this file.
 #
 # [[redirects]]
 #   from = "/api/*"

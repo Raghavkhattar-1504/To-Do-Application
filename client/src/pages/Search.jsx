@@ -45,6 +45,7 @@ export default function Search() {
       setStatus((prev) => (prev === 'ready' ? prev : 'loading'));
       searchTasks(trimmed, { signal: controller.signal })
         .then((data) => {
+          if (!Array.isArray(data)) throw new Error('The API did not return a task list.');
           setResults(data);
           setSearchedFor(trimmed);
           setError(null);

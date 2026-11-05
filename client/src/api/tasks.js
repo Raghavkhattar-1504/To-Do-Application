@@ -7,24 +7,38 @@ async function request(path, options = {}) {
   });
   if (res.status === 204) return null;
 
-  const body = await res.json().catch(() => null);
+  const body = await res.json().catch(() => undefined);
   if (!res.ok) {
     const error = new Error(body?.error || `Request failed with status ${res.status}`);
     error.status = res.status;
     error.fields = body?.fields;
     throw error;
   }
+  // A 2xx that is not JSON is almost always the host's SPA fallback answering
+  // in place of the API (for example Netlify serving index.html for /api/*
+  // when VITE_API_URL is not set).
+  if (body === undefined) {
+    const error = new Error('The API returned an unexpected response. Check that VITE_API_URL points at the API.');
+    error.status = res.status;
+    throw error;
+  }
+  return body;
+}
+
+async function requestTaskList(query, signal) {
+  const body = await request(`/tasks?${query}`, { signal });
+  if (!Array.isArray(body)) {
+    throw new Error('The API returned an unexpected response. Check that VITE_API_URL points at the API.');
+  }
   return body;
 }
 
 export function listTasksInRange({ from, to }, { signal } = {}) {
-  const params = new URLSearchParams({ from, to });
-  return request(`/tasks?${params}`, { signal });
+  return requestTaskList(new URLSearchParams({ from, to }), signal);
 }
 
 export function searchTasks(query, { signal } = {}) {
-  const params = new URLSearchParams({ q: query });
-  return request(`/tasks?${params}`, { signal });
+  return requestTaskList(new URLSearchParams({ q: query }), signal);
 }
 
 export function createTask(values) {

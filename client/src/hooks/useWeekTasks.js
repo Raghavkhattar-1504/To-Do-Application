@@ -19,6 +19,7 @@ export function useWeekTasks({ from, to }) {
       }
       listTasksInRange({ from, to }, { signal: controller.signal })
         .then((data) => {
+          if (!Array.isArray(data)) throw new Error('The API did not return a task list.');
           setTasks(data);
           setStatus('ready');
           setError(null);

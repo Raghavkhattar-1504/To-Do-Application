@@ -176,6 +176,29 @@ describe('US-05 See weekly complete, pending, and progress', () => {
     expect(screen.getByRole('progressbar')).not.toHaveAttribute('aria-valuenow');
   });
 
+  it('shows an error instead of crashing when the host answers with a non-JSON page', async () => {
+    setToday('2026-11-05');
+    // e.g. Netlify's SPA fallback serving index.html with 200 for /api/tasks
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => new Response('<!doctype html><html></html>', { status: 200, headers: { 'Content-Type': 'text/html' } })),
+    );
+    renderHome();
+
+    expect(await screen.findByText(/Could not load tasks: The API returned an unexpected response/)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Try again' })).toBeInTheDocument();
+    expect(screen.getByRole('group', { name: 'Task Complete: not available' })).toBeInTheDocument();
+  });
+
+  it('shows an error instead of crashing when the API answers with JSON null', async () => {
+    setToday('2026-11-05');
+    vi.stubGlobal('fetch', vi.fn(async () => jsonResponse(null)));
+    renderHome();
+
+    expect(await screen.findByText(/Could not load tasks:/)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Try again' })).toBeInTheDocument();
+  });
+
   it('refreshes the cards and the progress bar when tasks change and the app regains focus', async () => {
     setToday('2026-11-05');
     const { store } = stubTaskApi(WEEK_TASKS);
